@@ -1,0 +1,26 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Install PHP and Composer (Amplify doesn't support PHP backends properly)
+        - yum install -y php php-mbstring php-xml php-zip unzip
+        - curl -sS https://getcomposer.org/installer | php
+        - mv composer.phar /usr/local/bin/composer
+        - composer install --no-dev --optimize-autoloader
+        
+        # Install Node dependencies
+        - npm ci
+    build:
+      commands:
+        # Build frontend assets
+        - npm run build
+  artifacts:
+    baseDirectory: public
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - vendor/**/*
+
